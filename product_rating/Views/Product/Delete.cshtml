@@ -1,0 +1,38 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model systemrating.Data.EntityModels.Product
+
+<form asp-action="Delete" asp-controller="Product" method="post">
+    <input asp-for="Id" type="hidden" />
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label>Product Name:</label>
+                <input asp-for="Name" disabled type="text" />
+            </div>
+            <div class="form-group">
+                <label>Price:</label>
+                <input asp-for="Price" disabled type="number" />
+            </div>
+            <div class="form-group">
+                <label>Description:</label>
+                <textarea asp-for="Description" disabled type="text" ></textarea>
+            </div>
+            <div class="form-group">
+                <label>Product Quantity:</label>
+                <input asp-for="Quantity" disabled  type="number" />
+            </div>
+            <div class="form-group">
+                <label>Product Image:</label>
+                <input asp-for="Photo" disabled  type="text" />
+            </div>
+            <div class = "card-footer">
+                <center>
+                    <button type="submit" class="btn btn-sucess">Delete Product</button>
+                </center>
+            </div>
+        </div>
+    </div>
+</form>
+
