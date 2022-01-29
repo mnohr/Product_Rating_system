@@ -4,6 +4,7 @@
 <script>
     $(document).ready(function () {
 
+
         $("#BestProduct").click(function () {
             $.ajax({
                 type: "GET",
@@ -19,11 +20,6 @@
             $('.tbody').html(s);
                 }
             });
-
-
-           
-
-            
         });
 
 
@@ -42,7 +38,8 @@
             $('.tbody').html(s);
                 }
             });
-            });
+        });
+
 
     });
 </script>
@@ -54,6 +51,9 @@
 <div class="row">
     <div class="col-md-4">
         <p> Category Product By :</p>
+    </div>
+     <div class="col-md-2">
+        <a class="text-decoration-none text-dark" asp-action="FilterProduct" asp-controller="Product"><button>All Product</button></a>
     </div>
     <div class="col-md-2">
         <button id="BestProduct" class="" >Good </button>
