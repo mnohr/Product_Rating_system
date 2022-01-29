@@ -26,7 +26,7 @@ namespace product_rating.Repositories
             }
             else
             {
-                string Message = "UserName already exists" + user.Name;
+                string Message = user.Name + " "+ "UserName already exists" ;
                 return Message;
             }
         }

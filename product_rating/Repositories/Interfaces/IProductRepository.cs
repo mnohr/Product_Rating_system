@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using systemrating.Data.Dtos;
 using systemrating.Data.EntityModels;
 
 namespace product_rating.Repositories.Interfaces
@@ -14,5 +15,13 @@ namespace product_rating.Repositories.Interfaces
         void DeleteProduct(Product product);
 
         IEnumerable ViewAllDetails(int id);
+
+        //IEnumerable BestReviewProduct();
+
+        IEnumerable<ProductReviewDto> GetBestReview();
+
+        IEnumerable<ProductReviewDto> GetBadReview();
+
+        IEnumerable<ProductReviewDto> GetAllReviewByRating();
     }
 }

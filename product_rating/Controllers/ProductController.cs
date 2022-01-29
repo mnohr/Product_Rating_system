@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using product_rating.Repositories.Interfaces;
+using System.Linq;
+using System.Text;
+using Newtonsoft.Json;
 using systemrating.Data.EntityModels;
-
+using Newtonsoft.Json.Linq;
+using systemrating.Data.Dtos;
 
 namespace product_rating.Controllers
 {
@@ -22,16 +26,6 @@ namespace product_rating.Controllers
             return View(Product);
         }
 
-        //[HttpGet("getproductid")]
-
-        //public async Task<IActionResult> Getp()
-        //{
-        //    var q = _context.Reviews;
-           
-        //    return Ok(q);
-
-        //}
-
         [HttpGet]
         public IActionResult Create()
         {
@@ -45,10 +39,7 @@ namespace product_rating.Controllers
             {
                 try
                 {
-                   // await _context.AddAsync(product);
-                   // await _context.SaveChangesAsync();
                    _productRepository.AddProduct(product);  
-
                     return RedirectToAction("Index");
                 } catch (Exception ex)
                 {
@@ -77,12 +68,9 @@ namespace product_rating.Controllers
             {
                 try
                 {
-                      _productRepository.EditProduct(product);
-
-                       return RedirectToAction("Index");
-                    
-                    ModelState.AddModelError(string.Empty, "something went worng");
-                    return View(product);
+                    _productRepository.EditProduct(product);
+                    return RedirectToAction("Index"); 
+                 
                 }catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, $"something went wrong {ex.Message}");
@@ -109,9 +97,6 @@ namespace product_rating.Controllers
                     _productRepository.DeleteProduct(product);
                      return RedirectToAction("Index");
                     
-
-                    //ModelState.AddModelError(String.Empty, "something went wrong");
-                    //return View(product);
                 }catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, $"something went wrong {ex.Message}");
@@ -125,95 +110,79 @@ namespace product_rating.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewDetails(int id)
         {
-
-            ViewBag.Product = _context.Products.Where(x => x.Id == id).ToList();
             ViewBag.ProductId = id;
             ViewBag.Productdetails = _productRepository.ViewAllDetails(id);
-      
             return View();
-          
         }
      
-
-        [HttpGet("pr")]
-        public PartialViewResult ViewAllProduct()
+        [HttpGet]
+        public IActionResult FilterProduct()
         {
+            var product = _productRepository.GetAllReviewByRating();
+            return View(product);
+        }
 
-            var product = _context.Products.ToList();
-            var review = _context.Reviews.ToList();
+        //[HttpGet]
+        //public IActionResult ViewAllProductOrderByRating()
+        //{
+        //    var product = _productRepository.GetAllReviewByRating();
+        //    return View()     
+        //}
 
-            var Productquery = (from p in product
-                        select new
-                        {
-                            Name = p.Name,
-                            Description = p.Description,
-                            Quantity = p.Quantity,
-                            Price = p.Price,
-                            Image = p.Photo,
-                            AverageRating = review.Where(x => x.ProductId == p.Id).Average(x => x.Rating),
 
-                        }).OrderByDescending(x=> x.AverageRating).ToList();
-            if(Productquery != null)
-            {
-                return PartialView("FilterProduct",Productquery);
-            }
-
-            return PartialView();
+        [HttpGet]
+        public IActionResult BestReviewOnProduct()
+        {
+            var bestReview = _productRepository.GetBestReview();
+            return new JsonResult(bestReview);
         }
 
 
-        [HttpGet("pr1")]
-        public PartialViewResult BestReviewProduct()
+        [HttpGet]
+        public IActionResult BadReviewProduct()
         {
-
-            var product = _context.Products.ToList();
-            var review = _context.Reviews.ToList();
-
-            var Productquery = (from p in product
-                                select new
-                                {
-                                    Name = p.Name,
-                                    Description = p.Description,
-                                    Quantity = p.Quantity,
-                                    Price = p.Price,
-                                    Image = p.Photo,
-                                    AverageRating = review.Where(x => x.ProductId == p.Id).Average(x => x.Rating),
-
-                                }).Where(x => x.AverageRating >= 3).OrderByDescending(x => x.AverageRating).ToList();
-            if (Productquery != null)
-            {
-                return PartialView("FilterProduct", Productquery);
-            }
-
-            return PartialView();
+            var product = _productRepository.GetBadReview();
+            return new JsonResult(product);
         }
 
 
-
-        [HttpGet("pr2")]
-        public PartialViewResult BadReviewProduct()
+        [HttpGet]
+        public IActionResult ExportAllReviewInCSV()
         {
-
-            var product = _context.Products.ToList();
-            var review = _context.Reviews.ToList();
-
-            var Productquery = (from p in product
-                                select new
-                                {
-                                    Name = p.Name,
-                                    Description = p.Description,
-                                    Quantity = p.Quantity,
-                                    Price = p.Price,
-                                    Image = p.Photo,
-                                    AverageRating = review.Where(x => x.ProductId == p.Id).Average(x => x.Rating),
-
-                                }).Where(x => x.AverageRating <  3).OrderByDescending(x => x.AverageRating).ToList();
-            if (Productquery != null)
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("All Product Review order by Rating");
+            sb.AppendLine("Product Name, Description, Price, Quantity, AverageRating");
+            foreach (var item in _productRepository.GetAllReviewByRating())
             {
-                return PartialView("FilterProduct", Productquery);
+                sb.AppendLine($"{item.Name}, {item.Description} ,{item.Price} ,{item.Quantity},{item.AverageRating}");
             }
-
-            return PartialView();
+            return File(Encoding.UTF8.GetBytes(sb.ToString()), "text/csv", "product.csv");
         }
+
+        [HttpGet]
+        public IActionResult ExportBestReviewInCSV()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Product Name, Description, Price, Quantity, AverageRating");
+            foreach (var item in _productRepository.GetBestReview())
+            {
+                sb.AppendLine($"{item.Name}, {item.Description} ,{item.Price} ,{item.Quantity},{item.AverageRating}");
+            }
+            return File(Encoding.UTF8.GetBytes(sb.ToString()), "text/csv", "product.csv");
+        }
+
+        [HttpGet]
+        public IActionResult ExportBadReviewInCSV()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("All Bad Reivew on Product Details");
+            sb.AppendLine("Product Name, Description, Price, Quantity, AverageRating");
+            foreach (var item in _productRepository.GetBadReview())
+            {
+                sb.AppendLine($"{item.Name}, {item.Description} ,{item.Price} ,{item.Quantity},{item.AverageRating}");
+            }
+            return File(Encoding.UTF8.GetBytes(sb.ToString()), "text/csv", "product.csv");
+        }
+
     }
 }

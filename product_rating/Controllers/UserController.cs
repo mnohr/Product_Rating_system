@@ -48,6 +48,7 @@ namespace product_rating.Controllers
                 }
 
             }
+            ModelState.AddModelError(String.Empty, "Something went wrong");
             return View();
         }
 
@@ -55,13 +56,10 @@ namespace product_rating.Controllers
 
         [HttpGet]
         public IActionResult Login()
-        {
-            
+        {      
             return View();
         }
 
-        //const string UserId = "Id";
-        //const string UserName = "Name";
         [HttpPost]
         public ActionResult Login(User user)
         {

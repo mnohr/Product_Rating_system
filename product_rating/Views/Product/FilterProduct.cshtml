@@ -1,1 +1,126 @@
-﻿
+﻿@model List<systemrating.Data.Dtos.ProductReviewDto>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $("#BestProduct").click(function () {
+            $.ajax({
+                type: "GET",
+                url: "/Product/BestReviewOnProduct",
+                success:function(result){
+                     var s = '';
+                        
+                        for (var i =0; i < result.length; i++) {
+                            s += '<tr><td>'+(i+1)+'</td><td>' + result[i].name+'</td><td>'+result[i].description+'</td><td>'+result[i].price+'</td><td>'+result[i].quantity+'</td><td>'+result[i].averageRating+'</td><td>'+ '<a class="btn btn-info"  href="ViewDetails/'+result[i].id+'">View Details</a></td></tr>';
+                        }
+
+           $('.csv').html("<a class='text-dark'  href='/Product/ExportBestReviewInCSV'>Export to csv</a>");
+            $('.tbody').html(s);
+                }
+            });
+
+
+           
+
+            
+        });
+
+
+          $("#BadProduct").click(function () {
+            $.ajax({
+                type: "GET",
+                url: "/Product/BadReviewProduct",
+                success:function(result){
+                     var s = '';
+                        
+                        for (var i =0; i < result.length; i++) {
+                            s += '<tr><td>'+(i+1)+'</td><td>' + result[i].name+'</td><td>'+result[i].description+'</td><td>'+result[i].price+'</td><td>'+result[i].quantity+'</td><td>'+result[i].averageRating+'</td><td>'+ '<a class="btn btn-info"  href="ViewDetails/'+result[i].id+'">View Details</a></td></tr>';
+                        }
+
+           $('.csv').html("<a class='text-dark'  href='/Product/ExportBadReviewInCSV'>Export to csv</a>");
+            $('.tbody').html(s);
+                }
+            });
+            });
+
+    });
+</script>
+
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+<div class="row">
+    <div class="col-md-4">
+        <p> Category Product By :</p>
+    </div>
+    <div class="col-md-2">
+        <button id="BestProduct" class="" >Good </button>
+    </div>
+     <div class="col-md-2">
+        <button id="BadProduct" >Bad</button>
+    </div>
+</div>
+
+  
+         <div class="row csv">
+             <a class="text-dark" asp-action="ExportAllReviewInCSV" asp-controller="Product">Expert To CSV</a>
+         </div>
+           <div class="row ">
+    <div class="col-md-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Id</td>
+                    <td>Product Name</td>
+                    <td>Description</td>
+                    <td>Price</td>
+                    <td>Quantity</td>
+                    <td>Rating</td>
+                    <td>View Product</td>
+                </tr>
+            </thead>
+            <tbody class="tbody">
+                @{
+                    int counter = 1;
+                    foreach(var item in Model)
+                    {
+                        <tr>
+                            <td>@(
+                                    counter ++)
+                                </td>
+                            <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <td>@item.Price</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.AverageRating</td>
+                        <td> <a class="btn btn-info" asp-action="ViewDetails" asp-controller="Product" asp-route-id="@item.Id">
+                            View Details
+                        </a></td>
+                        </tr>
+                    }
+
+                    //for(int i =0; i < Model.Count; i++)
+                    //{
+                    //    <tr>
+                    //    <td>@(i+1)</td>
+                    //    <td>@Model[i].Name</td>
+                    //    <td>@Model[i].Description</td>
+                    //    <td>@Model[i].Price</td>
+                    //    <td>@Model[i].Quantity</td>
+                    //    <td>@Model[i].AverageRating</td>
+                    //     <td> <a class="btn btn-info" asp-action="ViewDetails" asp-controller="Product" asp-route-id="@Model[i].Id">
+                    //       View Details
+                    //  </a></td>
+                    //    </tr>
+                    //}
+
+            }
+
+            </tbody>
+        </table>
+    </div>
+</div>
+     
+
